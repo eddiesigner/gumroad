@@ -76,7 +76,7 @@ type Affiliate = {
   amount: string;
 };
 
-type Product = {
+export type Product = {
   custom_permalink: string | null;
   custom_receipt: string | null;
   custom_summary: string;
