@@ -44,7 +44,7 @@ export default function Command() {
 
   return (
     <List
-      isLoading={isLoadingSales}
+      isLoading={isLoadingSales || sales.length === 0}
       searchBarAccessory={
         <List.Dropdown
           tooltip={"Select Product"}
