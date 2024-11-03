@@ -1,7 +1,7 @@
 import { getPreferenceValues, List, ActionPanel, Action, Icon, Color } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 import { useState, useEffect } from "react";
-import { SalesResponse, ProductsResponse, Sale, Product } from "./types";
+import { SalesResponse, ProductsResponse, Sale } from "./types";
 import { formatDate } from "./utils";
 import { SaleDetails } from "./sale-details";
 import { BASE_URL, SALES_ENDPOINT, PRODUCTS_ENDPOINT } from "./const";
@@ -12,6 +12,7 @@ const TOKEN_PARAM = `access_token=${token}`;
 export default function Command() {
   const [pageUrl, setPageUrl] = useState<string>(`${BASE_URL}${SALES_ENDPOINT}?${TOKEN_PARAM}`);
   const [sales, setSales] = useState<Sale[]>([]);
+  const [productId, setProductId] = useState<string>("");
   const { data: salesData, isLoading: isLoadingSales, revalidate } = useFetch<SalesResponse>(pageUrl);
   const { data: productsData } = useFetch<ProductsResponse>(
     `${BASE_URL}${PRODUCTS_ENDPOINT}?${TOKEN_PARAM}`
@@ -31,6 +32,7 @@ export default function Command() {
   }
 
   const onProductChange = (newValue: string) => {
+    setProductId(newValue);
     if (newValue === "") {
       setPageUrl(`${BASE_URL}${SALES_ENDPOINT}?${TOKEN_PARAM}`);
     } else {
@@ -43,7 +45,24 @@ export default function Command() {
   return (
     <List
       isLoading={isLoadingSales}
-      searchBarAccessory={<ProductsDropdown products={productsData?.products || []} onProductChange={onProductChange} />}
+      searchBarAccessory={
+        <List.Dropdown
+          tooltip={"Select Product"}
+          value={productId}
+          onChange={onProductChange}
+        >
+          <List.Dropdown.Section title="Products">
+            <List.Dropdown.Item title="All Products" value="" />
+            {productsData?.products.map((product) => (
+              <List.Dropdown.Item
+                key={product.id}
+                title={product.name}
+                value={product.id}
+              />
+            ))}
+          </List.Dropdown.Section>
+        </List.Dropdown>
+      }
     >
       {sales.map((sale) => (
         <List.Item
@@ -77,30 +96,4 @@ export default function Command() {
       )}
     </List>
   )
-}
-
-function ProductsDropdown(props: { products: Product[]; onProductChange: (newValue: string) => void }) {
-  const { products, onProductChange } = props;
-
-  return (
-    <List.Dropdown
-      tooltip={"Select Product"}
-      storeValue={true}
-      defaultValue=""
-      onChange={(newValue) => {
-        onProductChange(newValue);
-      }}
-    >
-      <List.Dropdown.Section title="Products">
-        <List.Dropdown.Item title="All Products" value="" />
-        {products.map((product) => (
-          <List.Dropdown.Item
-            key={product.id}
-            title={product.name}
-            value={product.id}
-          />
-        ))}
-      </List.Dropdown.Section>
-    </List.Dropdown>
-  );
 }
