@@ -25,7 +25,7 @@ ${item.product_name}
   );
 }
 
-export function SaleMetadata(props: { sale: Sale }) {
+function SaleMetadata(props: { sale: Sale }) {
   const item = props.sale;
 
   return (
@@ -40,7 +40,7 @@ export function SaleMetadata(props: { sale: Sale }) {
       <Detail.Metadata.Label title={"Quantity"} text={`${item.quantity}`} />
       <Detail.Metadata.Label title={"Referrer"} text={item.referrer} />
       {item.variants_and_quantity && (
-        <Detail.Metadata.Label title={"Version"} text={removeParentheses(item.variants_and_quantity)} />
+        <Detail.Metadata.Label title={"Variant"} text={removeParentheses(item.variants_and_quantity)} />
       )}
     </Detail.Metadata>
   );

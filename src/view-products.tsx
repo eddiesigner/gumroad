@@ -2,16 +2,18 @@ import { getPreferenceValues, List, ActionPanel, Action, Icon, Color } from "@ra
 import { useFetch } from "@raycast/utils";
 import { ProductsResponse } from "./types";
 import { ProductDetails } from "./product-details";
+import { formatNumber } from "./utils";
+import { BASE_URL, PRODUCTS_ENDPOINT } from "./const";
 
 const token = getPreferenceValues<Preferences>().token;
 
 export default function Command() {
-  const { data } = useFetch<ProductsResponse>(
-    `https://api.gumroad.com/v2/products?access_token=${token}`
+  const { data, isLoading } = useFetch<ProductsResponse>(
+    `${BASE_URL}${PRODUCTS_ENDPOINT}?access_token=${token}`
   );
 
   return (
-    <List isLoading={!data}>
+    <List isLoading={isLoading}>
       {data?.products.map((product) => (
         <List.Item
           key={product.id}
@@ -20,7 +22,8 @@ export default function Command() {
           icon={product.thumbnail_url ? { source: product.thumbnail_url } : { source: Icon.Image, tintColor: Color.Magenta }}
           accessories={[
             {
-              text: `${product.sales_count} Sales`,
+              text: `${formatNumber(product.sales_count)} Sales`,
+              icon: { source: Icon.Cart, tintColor: Color.Green },
             },
           ]}
           actions={

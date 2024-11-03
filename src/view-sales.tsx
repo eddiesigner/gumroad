@@ -1,24 +1,56 @@
 import { getPreferenceValues, List, ActionPanel, Action, Icon, Color } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
-import { SalesResponse } from "./types";
+import { useState, useEffect } from "react";
+import { SalesResponse, ProductsResponse, Sale, Product } from "./types";
 import { formatDate } from "./utils";
 import { SaleDetails } from "./sale-details";
+import { BASE_URL, SALES_ENDPOINT, PRODUCTS_ENDPOINT } from "./const";
 
 const token = getPreferenceValues<Preferences>().token;
+const TOKEN_PARAM = `access_token=${token}`;
 
 export default function Command() {
-  const { data } = useFetch<SalesResponse>(
-    `https://api.gumroad.com/v2/sales?access_token=${token}`
+  const [pageUrl, setPageUrl] = useState<string>(`${BASE_URL}${SALES_ENDPOINT}?${TOKEN_PARAM}`);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const { data: salesData, isLoading: isLoadingSales, revalidate } = useFetch<SalesResponse>(pageUrl);
+  const { data: productsData } = useFetch<ProductsResponse>(
+    `${BASE_URL}${PRODUCTS_ENDPOINT}?${TOKEN_PARAM}`
   );
 
+  useEffect(() => {
+    if (salesData?.sales && !isLoadingSales) {
+      setSales([...sales, ...salesData.sales]);
+    }
+  }, [salesData]);
+
+  const loadMore = () => {
+    if (salesData?.next_page_url) {
+      setPageUrl(`${BASE_URL}${salesData.next_page_url}&${TOKEN_PARAM}`);
+      revalidate();
+    }
+  }
+
+  const onProductChange = (newValue: string) => {
+    if (newValue === "") {
+      setPageUrl(`${BASE_URL}${SALES_ENDPOINT}?${TOKEN_PARAM}`);
+    } else {
+      setPageUrl(`${BASE_URL}${SALES_ENDPOINT}?${TOKEN_PARAM}&product_id=${newValue}`);
+    }
+    setSales([]);
+    revalidate();
+  }
+
   return (
-    <List isLoading={!data}>
-      {data?.sales.map((sale) => (
+    <List
+      isLoading={isLoadingSales}
+      searchBarAccessory={<ProductsDropdown products={productsData?.products || []} onProductChange={onProductChange} />}
+    >
+      {sales.map((sale) => (
         <List.Item
           key={sale.id}
           title={sale.product_name}
           subtitle={formatDate(sale.created_at)}
-          icon={ {source: Icon.Coins, tintColor: Color.Magenta }}
+          icon={{source: Icon.Coins, tintColor: Color.Magenta }}
           accessories={[
             {
               text: sale.formatted_total_price,
@@ -32,6 +64,43 @@ export default function Command() {
           }
         />
       ))}
+      {sales.length > 0 && salesData?.next_page_url && (
+        <List.Item
+          title="Load More"
+          icon={{source: Icon.Ellipsis, tintColor: Color.PrimaryText }}
+          actions={
+            <ActionPanel>
+              <Action title="Load More" onAction={loadMore} />
+            </ActionPanel>
+          }
+        />
+      )}
     </List>
   )
+}
+
+function ProductsDropdown(props: { products: Product[]; onProductChange: (newValue: string) => void }) {
+  const { products, onProductChange } = props;
+
+  return (
+    <List.Dropdown
+      tooltip={"Select Product"}
+      storeValue={true}
+      defaultValue=""
+      onChange={(newValue) => {
+        onProductChange(newValue);
+      }}
+    >
+      <List.Dropdown.Section title="Products">
+        <List.Dropdown.Item title="All Products" value="" />
+        {products.map((product) => (
+          <List.Dropdown.Item
+            key={product.id}
+            title={product.name}
+            value={product.id}
+          />
+        ))}
+      </List.Dropdown.Section>
+    </List.Dropdown>
+  );
 }

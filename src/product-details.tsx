@@ -1,6 +1,7 @@
 import { Detail, ActionPanel, Color, Action } from "@raycast/api";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { Product } from "./types";
+import { formatNumber } from "./utils";
 
 export function ProductDetails(props: { product: Product }) {
   const item = props.product;
@@ -40,7 +41,7 @@ export function ProductMetadata(props: { product: Product }) {
       </Detail.Metadata.TagList>
       <Detail.Metadata.Label title={"ID"} text={item.id} />
       <Detail.Metadata.Separator />
-      <Detail.Metadata.Label title={"Number of Sales"} text={`${item.sales_count}`} />
+      <Detail.Metadata.Label title={"Number of Sales"} text={`${formatNumber(item.sales_count)}`} />
       <Detail.Metadata.Label title={"Status"} text={item.published ? "🟢 Published" : "⚪ Not Published"} />
       {item.variants.length > 0 && <Detail.Metadata.Separator />}
       {item.variants.map((variant, variantIndex) => {
