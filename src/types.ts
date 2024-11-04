@@ -80,7 +80,7 @@ export type Product = {
   custom_permalink: string | null;
   custom_receipt: string | null;
   custom_summary: string;
-  custom_fields: any[];
+  custom_fields: never[];
   customizable_price: number | null;
   description: string;
   deleted: boolean;
@@ -99,7 +99,7 @@ export type Product = {
   thumbnail_url: string;
   tags: string[];
   formatted_price: string;
-  file_info: Record<string, any>;
+  file_info: Record<string, never>;
   sales_count: string;
   sales_usd_cents: string;
   is_tiered_membership: boolean;

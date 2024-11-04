@@ -16,13 +16,7 @@ You made a sale!
 ${item.product_name}
   `;
 
-  return (
-    <Detail
-      markdown={markdown}
-      navigationTitle={item.product_name}
-      metadata={<SaleMetadata sale={item} />}
-    />
-  );
+  return <Detail markdown={markdown} navigationTitle={item.product_name} metadata={<SaleMetadata sale={item} />} />;
 }
 
 function SaleMetadata(props: { sale: Sale }) {

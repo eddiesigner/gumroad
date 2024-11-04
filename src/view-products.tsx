@@ -8,9 +8,7 @@ import { BASE_URL, PRODUCTS_ENDPOINT } from "./const";
 const token = getPreferenceValues<Preferences>().token;
 
 export default function Command() {
-  const { data, isLoading } = useFetch<ProductsResponse>(
-    `${BASE_URL}${PRODUCTS_ENDPOINT}?access_token=${token}`
-  );
+  const { data, isLoading } = useFetch<ProductsResponse>(`${BASE_URL}${PRODUCTS_ENDPOINT}?access_token=${token}`);
 
   return (
     <List isLoading={isLoading}>
@@ -19,7 +17,9 @@ export default function Command() {
           key={product.id}
           title={product.name}
           subtitle={product.formatted_price}
-          icon={product.thumbnail_url ? { source: product.thumbnail_url } : { source: Icon.Image, tintColor: Color.Magenta }}
+          icon={
+            product.thumbnail_url ? { source: product.thumbnail_url } : { source: Icon.Image, tintColor: Color.Magenta }
+          }
           accessories={[
             {
               text: `${formatNumber(product.sales_count)} Sales`,
@@ -35,5 +35,5 @@ export default function Command() {
         />
       ))}
     </List>
-  )
+  );
 }

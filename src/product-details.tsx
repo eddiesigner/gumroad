@@ -8,11 +8,7 @@ export function ProductDetails(props: { product: Product }) {
   const markdown = `
 # ${item.name}
 
-${
-  item.thumbnail_url
-    ? `![Illustration](${item.thumbnail_url})`
-    : ""
-}
+${item.thumbnail_url ? `![Illustration](${item.thumbnail_url})` : ""}
 
 ${NodeHtmlMarkdown.translate(item.description)}
   `;

@@ -14,9 +14,7 @@ export default function Command() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [productId, setProductId] = useState<string>("");
   const { data: salesData, isLoading: isLoadingSales, revalidate } = useFetch<SalesResponse>(pageUrl);
-  const { data: productsData } = useFetch<ProductsResponse>(
-    `${BASE_URL}${PRODUCTS_ENDPOINT}?${TOKEN_PARAM}`
-  );
+  const { data: productsData } = useFetch<ProductsResponse>(`${BASE_URL}${PRODUCTS_ENDPOINT}?${TOKEN_PARAM}`);
 
   useEffect(() => {
     if (salesData?.sales && !isLoadingSales) {
@@ -29,7 +27,7 @@ export default function Command() {
       setPageUrl(`${BASE_URL}${salesData.next_page_url}&${TOKEN_PARAM}`);
       revalidate();
     }
-  }
+  };
 
   const onProductChange = (newValue: string) => {
     setProductId(newValue);
@@ -40,25 +38,17 @@ export default function Command() {
     }
     setSales([]);
     revalidate();
-  }
+  };
 
   return (
     <List
       isLoading={isLoadingSales || sales.length === 0}
       searchBarAccessory={
-        <List.Dropdown
-          tooltip={"Select Product"}
-          value={productId}
-          onChange={onProductChange}
-        >
+        <List.Dropdown tooltip={"Select Product"} value={productId} onChange={onProductChange}>
           <List.Dropdown.Section title="Products">
             <List.Dropdown.Item title="All Products" value="" />
             {productsData?.products.map((product) => (
-              <List.Dropdown.Item
-                key={product.id}
-                title={product.name}
-                value={product.id}
-              />
+              <List.Dropdown.Item key={product.id} title={product.name} value={product.id} />
             ))}
           </List.Dropdown.Section>
         </List.Dropdown>
@@ -69,7 +59,7 @@ export default function Command() {
           key={sale.id}
           title={sale.product_name}
           subtitle={formatDate(sale.created_at)}
-          icon={{source: Icon.Coins, tintColor: Color.Magenta }}
+          icon={{ source: Icon.Coins, tintColor: Color.Magenta }}
           accessories={[
             {
               text: sale.formatted_total_price,
@@ -86,7 +76,7 @@ export default function Command() {
       {sales.length > 0 && salesData?.next_page_url && (
         <List.Item
           title="Load More"
-          icon={{source: Icon.Ellipsis, tintColor: Color.PrimaryText }}
+          icon={{ source: Icon.Ellipsis, tintColor: Color.PrimaryText }}
           actions={
             <ActionPanel>
               <Action title="Load More" onAction={loadMore} />
@@ -95,5 +85,5 @@ export default function Command() {
         />
       )}
     </List>
-  )
+  );
 }
